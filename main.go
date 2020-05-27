@@ -24,9 +24,11 @@ func main() {
 
 	postRouter := mux.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/", ph.AddProducts)
+	postRouter.Use(ph.MiddlewareProductAuthentication)
 
 	putRouter := mux.Methods(http.MethodPut).Subrouter()
 	putRouter.HandleFunc("/{id:[0-9]+}", ph.UpdateProduct)
+	putRouter.Use(ph.MiddlewareProductAuthentication)
 
 	s := &http.Server{
 		Addr:         ":9090",
