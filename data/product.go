@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-// Coffee defines the structure for an API product
-type Coffee struct {
+// Product defines the structure for an API product
+type Product struct {
 	ID          int     `json:"id"`
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
@@ -19,7 +19,13 @@ type Coffee struct {
 }
 
 // Products holds multiple product
-type Products []*Coffee
+type Products []*Product
+
+// FromJSON parses JSON to Go struct
+func (p *Product) FromJSON(r io.Reader) error {
+	d := json.NewDecoder(r)
+	return d.Decode(p)
+}
 
 // ToJSON parses products to JSON format
 func (p *Products) ToJSON(w io.Writer) error {
@@ -30,6 +36,17 @@ func (p *Products) ToJSON(w io.Writer) error {
 // GetProducts returns slice of products
 func GetProducts() Products {
 	return productList
+}
+
+// AddProducts adds a product to product list
+func AddProducts(p *Product) {
+	p.ID = getNextID()
+	productList = append(productList, p)
+}
+
+func getNextID() int {
+	lastProduct := productList[len(productList)-1]
+	return lastProduct.ID + 1
 }
 
 var productList = Products{
