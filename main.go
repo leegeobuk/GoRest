@@ -8,7 +8,8 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/leegeobuk/GoRestStdlib/handlers"
+	"github.com/gorilla/mux"
+	"github.com/leegeobuk/GoRest/handlers"
 )
 
 func main() {
@@ -16,8 +17,16 @@ func main() {
 
 	ph := handlers.NewProduct(l)
 
-	mux := http.NewServeMux()
-	mux.Handle("/", ph)
+	mux := mux.NewRouter()
+
+	getRouter := mux.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/", ph.GetProducts)
+
+	postRouter := mux.Methods(http.MethodPost).Subrouter()
+	postRouter.HandleFunc("/", ph.AddProducts)
+
+	putRouter := mux.Methods(http.MethodPut).Subrouter()
+	putRouter.HandleFunc("/{id:[0-9]+}", ph.UpdateProduct)
 
 	s := &http.Server{
 		Addr:         ":9090",
