@@ -1,4 +1,5 @@
-module github.com/leegeobuk/GoRestStdlib
+module github.com/leegeobuk/GoRest
 
 go 1.14
 
+require github.com/gorilla/mux v1.7.4
