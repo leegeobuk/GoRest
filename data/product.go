@@ -2,6 +2,7 @@ package data
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"time"
 )
@@ -21,7 +22,10 @@ type Product struct {
 // Products holds multiple product
 type Products []*Product
 
-// FromJSON parses JSON to Go struct
+// ErrProductNotFound thrown when product doesn't exist
+var ErrProductNotFound = errors.New("Product not found")
+
+// FromJSON parses JSON to Go value
 func (p *Product) FromJSON(r io.Reader) error {
 	d := json.NewDecoder(r)
 	return d.Decode(p)
@@ -42,6 +46,27 @@ func GetProducts() Products {
 func AddProducts(p *Product) {
 	p.ID = getNextID()
 	productList = append(productList, p)
+}
+
+// UpdateProduct updates the product with given id
+func UpdateProduct(id int, p *Product) error {
+	i, err := findIndex(id)
+
+	if err != nil {
+		return err
+	}
+
+	productList[i] = p
+	return nil
+}
+
+func findIndex(id int) (int, error) {
+	for i, p := range productList {
+		if id == p.ID {
+			return i, nil
+		}
+	}
+	return -1, ErrProductNotFound
 }
 
 func getNextID() int {

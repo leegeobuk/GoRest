@@ -3,6 +3,8 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"regexp"
+	"strconv"
 
 	"github.com/leegeobuk/GoRestStdlib/data"
 )
@@ -26,7 +28,29 @@ func (p *Products) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodPut {
-		
+		regex := regexp.MustCompile(`/([0-9]+)`)
+		g := regex.FindAllStringSubmatch(r.URL.Path, -1)
+
+		if len(g) != 1 {
+			http.Error(w, "Invalid URI, more than one ID", http.StatusBadRequest)
+			return
+		}
+
+		if len(g[0]) != 2 {
+			http.Error(w, "Invalid URI, more than one capture group", http.StatusBadRequest)
+			return
+		}
+
+		idString := g[0][1]
+		id, err := strconv.Atoi(idString)
+
+		if err != nil {
+			http.Error(w, "Invalid URI, unable to convert to number", http.StatusBadRequest)
+			return
+		}
+
+		p.Update(id, w, r)
+		return
 	}
 
 	// catch all
@@ -57,4 +81,21 @@ func (p *Products) Post(w http.ResponseWriter, r *http.Request) {
 
 	data.AddProducts(prod)
 	p.l.Printf("Prod: %#v", prod)
+}
+
+// Update updaates the product
+func (p *Products) Update(id int, w http.ResponseWriter, r *http.Request) {
+	prod := &data.Product{ID: id}
+
+	err := prod.FromJSON(r.Body)
+
+	if err != nil {
+		http.Error(w, "Unable to unmarshal json", http.StatusBadRequest)
+	}
+
+	err = data.UpdateProduct(id, prod)
+
+	if err == data.ErrProductNotFound {
+		http.Error(w, "Product not found", http.StatusNotFound)
+	}
 }
