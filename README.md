@@ -1,2 +1,2 @@
 # GoRestStdlib
-Go Restful API using standard library only
+Practive building REST API in Go
