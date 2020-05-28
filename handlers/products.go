@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -30,7 +31,9 @@ func (p *Products) GetProducts(w http.ResponseWriter, r *http.Request) {
 
 	// serialize the list to JSON
 	err := pl.ToJSON(w)
-	util.CheckErr(w, err, "Unable to marshal json", http.StatusInternalServerError)
+	if util.CheckErr(w, err, "Unable to marshal json", http.StatusInternalServerError) {
+		return
+	}
 }
 
 // AddProducts adds product to products list
@@ -45,15 +48,16 @@ func (p *Products) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	id, err := strconv.Atoi(vars["id"])
-	util.CheckErr(w, err, "Unable to parse id string to number", http.StatusBadRequest)
+	if util.CheckErr(w, err, "Unable to parse id string to number", http.StatusBadRequest) {
+		return
+	}
 
 	prod := r.Context().Value(keyProduct{}).(*data.Product)
 
-	err = prod.FromJSON(r.Body)
-	util.CheckErr(w, err, "Unable to unmarshal json", http.StatusBadRequest)
-
 	err = data.UpdateProduct(id, prod)
-	util.CheckErr(w, err, "Product not found", http.StatusNotFound)
+	if util.CheckErr(w, err, "Product not found", http.StatusNotFound) {
+		return
+	}
 	p.l.Printf("Update Prod: %#v", prod)
 }
 
@@ -63,8 +67,16 @@ func (p *Products) MiddlewareProductAuthentication(next http.Handler) http.Handl
 		prod := &data.Product{}
 
 		err := prod.FromJSON(r.Body)
-		util.CheckErr(w, err, "Unable to unmarshal JSON", http.StatusBadRequest)
+		if util.CheckErr(w, err, "Unable to unmarshal JSON", http.StatusBadRequest) {
+			return
+		}
 
+		err = prod.Validate()
+		if util.CheckErr(w, err, fmt.Sprintf("Error validating product: %s", err), http.StatusBadRequest) {
+			return
+		}
+
+		// add the product to context
 		ctx := context.WithValue(r.Context(), keyProduct{}, prod)
 		req := r.WithContext(ctx)
 
