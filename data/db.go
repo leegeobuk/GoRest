@@ -1,0 +1,65 @@
+package data
+
+import "time"
+
+// Products holds multiple product
+type Products []*Product
+
+var productList = Products{
+	{
+		ID:          1,
+		Name:        "Latte",
+		Description: "Frothy milky coffee",
+		Price:       2.45,
+		SKU:         "abc323",
+		Created:     time.Now().UTC().String(),
+		Updated:     time.Now().UTC().String(),
+	},
+	{
+		ID:          2,
+		Name:        "Espresso",
+		Description: "Short and strong coffee without milk",
+		Price:       1.99,
+		SKU:         "fjd34",
+		Created:     time.Now().UTC().String(),
+		Updated:     time.Now().UTC().String(),
+	},
+}
+
+// GetProducts returns slice of products
+func GetProducts() Products {
+	return productList
+}
+
+// AddProducts adds a product to product list
+func AddProducts(p *Product) {
+	p.ID = getNextID()
+	productList = append(productList, p)
+}
+
+// UpdateProduct updates the product with given id
+func UpdateProduct(id int, p *Product) error {
+	i, err := findIndex(id)
+
+	if err != nil {
+		return err
+	}
+
+	p.ID = id
+	productList[i] = p
+	return nil
+}
+
+func findIndex(id int) (int, error) {
+	for i, p := range productList {
+		if id == p.ID {
+			return i, nil
+		}
+	}
+	return -1, ErrProductNotFound
+}
+
+func getNextID() int {
+	lastProduct := productList[len(productList)-1]
+	return lastProduct.ID + 1
+}
