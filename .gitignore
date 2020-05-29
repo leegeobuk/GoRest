@@ -22,3 +22,6 @@ env
 
 # Makefile
 Makefile
+
+# swagger file
+swagger
