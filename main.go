@@ -8,7 +8,10 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/go-openapi/runtime/middleware"
+	gohandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/leegeobuk/GoRest/env"
 	"github.com/leegeobuk/GoRest/handlers"
 )
 
@@ -19,29 +22,47 @@ func main() {
 
 	mux := mux.NewRouter()
 
+	// handlers for API
 	getRouter := mux.Methods(http.MethodGet).Subrouter()
-	getRouter.HandleFunc("/", ph.GetProducts)
+	getRouter.HandleFunc("/products", ph.ListAll)
+	getRouter.HandleFunc("/products/{id:[0-9]+}", ph.ListSingle)
 
 	postRouter := mux.Methods(http.MethodPost).Subrouter()
-	postRouter.HandleFunc("/", ph.AddProducts)
+	postRouter.HandleFunc("/products", ph.AddProducts)
 	postRouter.Use(ph.MiddlewareProductAuthentication)
 
 	putRouter := mux.Methods(http.MethodPut).Subrouter()
-	putRouter.HandleFunc("/{id:[0-9]+}", ph.UpdateProduct)
+	putRouter.HandleFunc("/products", ph.Update)
 	putRouter.Use(ph.MiddlewareProductAuthentication)
 
+	deleteRouter := mux.Methods(http.MethodDelete).Subrouter()
+	deleteRouter.HandleFunc("/products/{id:[0-9]+}", ph.Delete)
+
+	// options for swagger handler
+	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
+	sh := middleware.Redoc(opts, nil)
+
+	getRouter.Handle("/docs", sh)
+	getRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./swagger")))
+
+	// CORS
+	ch := gohandlers.CORS(gohandlers.AllowedOrigins([]string{"http://localhost:3000"}))
+
 	s := &http.Server{
-		Addr:         ":9090",
-		Handler:      mux,
-		IdleTimeout:  120 * time.Second,
-		ReadTimeout:  1 * time.Second,
-		WriteTimeout: 1 * time.Second,
+		Addr:         env.Addr,
+		Handler:      ch(mux),
+		ErrorLog:     l,                 // set the logger for the server
+		ReadTimeout:  5 * time.Second,   // max time to read request from the client
+		WriteTimeout: 10 * time.Second,  // max time to write response to the client
+		IdleTimeout:  120 * time.Second, // max time for connections using TCP Keep-Alive
 	}
 
 	go func() {
+		l.Println("Starting server on port", env.Addr[1:])
 		err := s.ListenAndServe()
 		if err != nil {
-			l.Fatal(err)
+			l.Printf("Error starting server: %s\n", err)
+			os.Exit(1)
 		}
 	}()
 
