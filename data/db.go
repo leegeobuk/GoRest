@@ -1,7 +1,5 @@
 package data
 
-import "time"
-
 // Products holds multiple product
 type Products []*Product
 
@@ -12,8 +10,6 @@ var productList = Products{
 		Description: "Frothy milky coffee",
 		Price:       2.45,
 		SKU:         "abc323",
-		Created:     time.Now().UTC().String(),
-		Updated:     time.Now().UTC().String(),
 	},
 	{
 		ID:          2,
@@ -21,8 +17,6 @@ var productList = Products{
 		Description: "Short and strong coffee without milk",
 		Price:       1.99,
 		SKU:         "fjd34",
-		Created:     time.Now().UTC().String(),
-		Updated:     time.Now().UTC().String(),
 	},
 }
 
@@ -31,32 +25,54 @@ func GetProducts() Products {
 	return productList
 }
 
-// AddProducts adds a product to product list
-func AddProducts(p *Product) {
+// GetProduct returns the product with given id
+func GetProduct(id int) (*Product, error) {
+	i := findIndex(id)
+
+	if i == -1 {
+		return nil, ErrProductNotFound
+	}
+
+	return productList[i], nil
+}
+
+// AddProduct adds a product to product list
+func AddProduct(p *Product) {
 	p.ID = getNextID()
 	productList = append(productList, p)
 }
 
-// UpdateProduct updates the product with given id
-func UpdateProduct(id int, p *Product) error {
-	i, err := findIndex(id)
+// UpdateProduct updates the product to given product
+func UpdateProduct(p *Product) error {
+	i := findIndex(p.ID)
 
-	if err != nil {
-		return err
+	if i == -1 {
+		return ErrProductNotFound
 	}
 
-	p.ID = id
 	productList[i] = p
 	return nil
 }
 
-func findIndex(id int) (int, error) {
+// DeleteProduct deletes a product with given id from db
+func DeleteProduct(id int) error {
+	i := findIndex(id)
+
+	if i == -1 {
+		return ErrProductNotFound
+	}
+
+	productList = append(productList[:i], productList[i+1:]...)
+	return nil
+}
+
+func findIndex(id int) int {
 	for i, p := range productList {
 		if id == p.ID {
-			return i, nil
+			return i
 		}
 	}
-	return -1, ErrProductNotFound
+	return -1
 }
 
 func getNextID() int {
