@@ -16,3 +16,6 @@
 
 # vsc-dependent files
 .vscode
+
+# env package
+env
