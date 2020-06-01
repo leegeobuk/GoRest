@@ -1,2 +1,2 @@
-# GoServer
-Practice building servers in Go
+# rest-api
+Practice building REST API in Go
