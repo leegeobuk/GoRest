@@ -1,2 +1,2 @@
-# GoRestStdlib
-Practive building REST API in Go
+# GoServer
+Practice building servers in Go
