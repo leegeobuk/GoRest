@@ -3,7 +3,7 @@ package handlers
 import (
 	"log"
 
-	"github.com/leegeobuk/GoRest/handlers/products"
+	"github.com/leegeobuk/GoServer/GoServer/handlers/products"
 )
 
 // NewProduct creates new product handler

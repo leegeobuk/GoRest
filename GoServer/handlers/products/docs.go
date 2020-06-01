@@ -14,7 +14,7 @@
 // swagger:meta
 package products
 
-import "github.com/leegeobuk/GoRest/data"
+import "github.com/leegeobuk/GoServer/GoServer/data"
 
 // NOTE: Types defined here are purely for documentation purposes
 // these types are not used by any of the handers

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/leegeobuk/GoRest/data"
-	"github.com/leegeobuk/GoRest/util"
+	"github.com/leegeobuk/GoServer/GoServer/data"
+	"github.com/leegeobuk/GoServer/GoServer/util"
 )
 
 // MiddlewareProductAuthentication validates product in the request and calls next if ok

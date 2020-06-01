@@ -11,8 +11,8 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	gohandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/leegeobuk/GoRest/env"
-	"github.com/leegeobuk/GoRest/handlers"
+	"github.com/leegeobuk/GoServer/GoServer/env"
+	"github.com/leegeobuk/GoServer/GoServer/handlers"
 )
 
 func main() {

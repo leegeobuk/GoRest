@@ -1,4 +1,4 @@
-module github.com/leegeobuk/GoRest
+module github.com/leegeobuk/GoServer
 
 go 1.14
 

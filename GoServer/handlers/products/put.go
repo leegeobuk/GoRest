@@ -3,8 +3,8 @@ package products
 import (
 	"net/http"
 
-	"github.com/leegeobuk/GoRest/data"
-	"github.com/leegeobuk/GoRest/util"
+	"github.com/leegeobuk/GoServer/GoServer/data"
+	"github.com/leegeobuk/GoServer/GoServer/util"
 )
 
 // swagger:route PUT /products products updateProduct

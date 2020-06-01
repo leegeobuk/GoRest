@@ -3,7 +3,7 @@ package products
 import (
 	"net/http"
 
-	"github.com/leegeobuk/GoRest/data"
+	"github.com/leegeobuk/GoServer/GoServer/data"
 )
 
 // swagger:route POST /products products createProduct
