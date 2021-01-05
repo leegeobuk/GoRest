@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net"
 	"os"
 
@@ -21,7 +21,7 @@ func main() {
 
 	l, err := net.Listen("tcp", env.Addr)
 	if err != nil {
-		fmt.Printf("unable to listen %w", err)
+		log.Fatalf("unable to listen %s", err)
 		os.Exit(1)
 	}
 
